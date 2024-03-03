@@ -2,10 +2,11 @@
 <html>
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Pong wars | Koen van Gilst</title>
+    <title>Rock, Paper, Scissors, Lizard, Spock - Pong Wars</title>
     <meta
       name="description"
-      content="The eternal battle between day and night, good and bad. Written in JavaScript with some HTML & CSS in one index.html. Feel free to reuse the code and create your own version."
+      content="The eternal battle between Rock, Paper, Scissors, Lizard, Spock
+      . Written in JavaScript with some HTML & CSS in one index.html. Feel free to reuse the code and create your own version."
     />
     <link rel="canonical" href="https://pong-wars.koenvangilst.nl/" />
     <link rel="author" href="https://koenvangilst.nl" />
@@ -30,8 +31,8 @@
         display: flex;
         align-items: center;
         flex-direction: column;
-        width: min(70vh, 80%);
-        max-width: 600px;
+        width: min(70vh, 96%);
+        max-width: 800px;
         height: 100%;
       }
 
@@ -47,9 +48,12 @@
       #score {
         font-family: monospace;
         margin-top: 30px;
-        font-size: 16px;
-        padding-left: 20px;
+        font-size: 15px;
         color: #172b36;
+      }
+
+      .current_color {
+        background-color: #899a9c;
       }
 
       #made {
@@ -69,11 +73,13 @@
 
   <body>
     <div id="container">
-      <canvas id="pongCanvas" width="600" height="600"></canvas>
+      <canvas id="pongCanvas" width="800" height="800"></canvas>
       <div id="score"></div>
       <p id="made">
         made by <a href="https://koenvangilst.nl">Koen van Gilst</a> | source on
-        <a href="https://github.com/vnglst/pong-wars">github</a>
+        <a href="https://github.com/vnglst/pong-wars">github</a> | modified by
+        Steve Nicholson | source on
+        <a href="https://github.com/ssteve/pong-wars">github</a>
       </p>
     </div>
   </body>
@@ -82,75 +88,167 @@
     // Source palette: https://twitter.com/AlexCristache/status/1738610343499157872
     // Idea for Pong wars: https://twitter.com/nicolasdnl/status/1749715070928433161
 
-    const colorPalette = {
-      ArcticPowder: "#F1F6F4",
-      MysticMint: "#D9E8E3",
-      Forsythia: "#FFC801",
-      DeepSaffron: "#FF9932",
-      NocturnalExpedition: "#114C5A",
-      OceanicNoir: "#172B36",
-    };
+    /*
+          const colorPalette = {
+          ArcticPowder: "#F1F6F4",
+          MysticMint: "#D9E8E3",
+          Forsythia: "#FFC801",
+          DeepSaffron: "#FF9932",
+          NocturnalExpedition: "#114C5A",
+          OceanicNoir: "#172B36",
+        };
+    */
 
-    const canvas = document.getElementById("pongCanvas");
-    const ctx = canvas.getContext("2d");
-    const scoreElement = document.getElementById("score");
+    const gameColors = [
+      '#F5D4D5', //stone
+      '#FEF6D5', //paper
+      '#F2D5FF', //scissors
+      '#D7F4D7', //lizard
+      '#D5E4FF', //spock
+    ];
 
-    const DAY_COLOR = colorPalette.MysticMint;
-    const DAY_BALL_COLOR = colorPalette.NocturnalExpedition;
-    const NIGHT_COLOR = colorPalette.NocturnalExpedition;
-    const NIGHT_BALL_COLOR = colorPalette.MysticMint;
+    const gameColorNames = ['stone', 'paper', 'lizard', 'scissors', 'spock'];
+
+    const colorScores = Array(gameColors.length).fill(0);
+
+    const canvas = document.getElementById('pongCanvas');
+    const ctx = canvas.getContext('2d');
+    const scoreElement = document.getElementById('score');
+
+    const DAY_COLOR = 0;
+    const DAY_BALL_COLOR = 1;
+    const NIGHT_COLOR = 1;
+    const NIGHT_BALL_COLOR = 2;
+    const AFTERNOON_COLOR = 2;
+    const AFTERNOON_BALL_COLOR = 3;
+    const EVENING_COLOR = 3;
+    const EVENING_BALL_COLOR = 4;
+    const MORNING_COLOR = 4;
+    const MORNING_BALL_COLOR = 0;
+
     const SQUARE_SIZE = 25;
+
     const MIN_SPEED = 5;
-    const MAX_SPEED = 10;
+    const MAX_SPEED = 15;
 
     const numSquaresX = canvas.width / SQUARE_SIZE;
     const numSquaresY = canvas.height / SQUARE_SIZE;
 
-    let dayScore = 0;
-    let nightScore = 0;
-
     const squares = [];
 
-    // Populate the fields, one half day, one half night
+    // Populate the fields, dividing the square into 5 equal parts
+
+    // Populate the fields, dividing the square into 5 equal parts
     for (let i = 0; i < numSquaresX; i++) {
       squares[i] = [];
       for (let j = 0; j < numSquaresY; j++) {
-        squares[i][j] = i < numSquaresX / 2 ? DAY_COLOR : NIGHT_COLOR;
+        if (i + j < numSquaresX / 2) {
+          squares[i][j] = gameColors[MORNING_COLOR]; // Top-left triangle
+        } else if (i - j > numSquaresX / 2) {
+          squares[i][j] = gameColors[DAY_COLOR]; // Top-right triangle
+        } else if (i + j > (3 * numSquaresX) / 2) {
+          squares[i][j] = gameColors[AFTERNOON_COLOR]; // Bottom-left triangle
+        } else if (j - i > numSquaresX / 2) {
+          squares[i][j] = gameColors[EVENING_COLOR]; // Bottom-right triangle
+        } else {
+          squares[i][j] = gameColors[NIGHT_COLOR]; // Inner square
+        }
       }
+    }
+
+    let ballColors = [
+      DAY_BALL_COLOR,
+      NIGHT_BALL_COLOR,
+      AFTERNOON_BALL_COLOR,
+      EVENING_BALL_COLOR,
+      MORNING_BALL_COLOR,
+    ];
+
+    let ballReverseColors = [
+      DAY_COLOR,
+      NIGHT_COLOR,
+      AFTERNOON_COLOR,
+      EVENING_COLOR,
+      MORNING_COLOR,
+    ];
+
+    function startSpeed() {
+      return (MIN_SPEED + MAX_SPEED) / 2.0 + Math.random() - 0.5;
     }
 
     const balls = [
       {
-        x: canvas.width / 4,
-        y: canvas.height / 2,
-        dx: 8,
-        dy: -8,
-        reverseColor: DAY_COLOR,
-        ballColor: DAY_BALL_COLOR,
+        x: canvas.width,
+        y: canvas.height,
+        dx: startSpeed(),
+        dy: startSpeed(),
+        id: 0,
       },
       {
-        x: (canvas.width / 4) * 3,
+        x: canvas.width,
+        y: 1,
+        dx: startSpeed(),
+        dy: startSpeed(),
+        id: 1,
+      },
+      {
+        x: 1,
+        y: canvas.height,
+        dx: -startSpeed(),
+        dy: startSpeed(),
+        id: 2,
+      },
+      {
+        x: 1,
+        y: 1,
+        dx: startSpeed(),
+        dy: -startSpeed(),
+        id: 3,
+      },
+      {
+        x: canvas.width / 2,
         y: canvas.height / 2,
-        dx: -8,
-        dy: 8,
-        reverseColor: NIGHT_COLOR,
-        ballColor: NIGHT_BALL_COLOR,
+        dx: startSpeed(),
+        dy: startSpeed(),
+        id: 4,
       },
     ];
 
     let iteration = 0;
+    let lastCollisionIteration = -1;
 
     function drawBall(ball) {
       ctx.beginPath();
       ctx.arc(ball.x, ball.y, SQUARE_SIZE / 2, 0, Math.PI * 2, false);
-      ctx.fillStyle = ball.ballColor;
+      ctx.fillStyle = gameColors[ballColors[ball.id]];
+      ctx.fill();
+      ctx.closePath();
+    }
+    function drawPaper(ball) {
+      ctx.beginPath();
+      ctx.rect(
+        ball.x - SQUARE_SIZE / 2,
+        ball.y - SQUARE_SIZE / 2,
+        SQUARE_SIZE,
+        SQUARE_SIZE
+      );
+
+      ctx.fillStyle = gameColors[ballColors[ball.id]];
       ctx.fill();
       ctx.closePath();
     }
 
+    function ballsAreNeighbors(ball1, ball2) {
+      return (
+        Math.abs(ball1.x - ball2.x) <= SQUARE_SIZE &&
+        Math.abs(ball1.y - ball2.y) <= SQUARE_SIZE
+      );
+    }
+
     function drawSquares() {
-      dayScore = 0;
-      nightScore = 0;
+      for (let index = 0; index < colorScores.length; index++) {
+        colorScores[index] = 0;
+      }
 
       for (let i = 0; i < numSquaresX; i++) {
         for (let j = 0; j < numSquaresY; j++) {
@@ -163,8 +261,7 @@
           );
 
           // Update scores
-          if (squares[i][j] === DAY_COLOR) dayScore++;
-          if (squares[i][j] === NIGHT_COLOR) nightScore++;
+          colorScores[gameColors.indexOf(squares[i][j])]++;
         }
       }
     }
@@ -179,9 +276,9 @@
         const j = Math.floor(checkY / SQUARE_SIZE);
 
         if (i >= 0 && i < numSquaresX && j >= 0 && j < numSquaresY) {
-          if (squares[i][j] !== ball.reverseColor) {
+          if (squares[i][j] !== gameColors[ballReverseColors[ball.id]]) {
             // Square hit! Update square color
-            squares[i][j] = ball.reverseColor;
+            squares[i][j] = gameColors[ballReverseColors[ball.id]];
 
             // Determine bounce direction based on the angle
             if (Math.abs(Math.cos(angle)) > Math.abs(Math.sin(angle))) {
@@ -224,14 +321,79 @@
         ball.dy = ball.dy > 0 ? MIN_SPEED : -MIN_SPEED;
     }
 
+    function ballLocation(ball) {
+      return `(${ball.x.toFixed(1)}, ${ball.y.toFixed(1)})`;
+    }
+
+    function scoreText() {
+      let text = '';
+      for (let index = 0; index < gameColors.length; index++) {
+        if (colorScores[index] > 0) {
+          if (text.length > 0) text += ' | ';
+          let namePrefix = '';
+          let nameSuffix = '';
+          if (ballReverseColors.includes(index)) {
+            // Highlight the names of the current colors.
+            namePrefix = `<span style='background-color: ${gameColors[index]};'>`;
+            nameSuffix = '</span>';
+          }
+          text += `${namePrefix}${gameColorNames[index]}${nameSuffix}&nbsp;`;
+          text += `${colorScores[index]}`
+            .padStart(3, `x`)
+            .replace(/x/g, '&nbsp;');
+        }
+      }
+      return text;
+    }
+
+    function randomIndex(excludedIndicies) {
+      let newValue = -1;
+      do {
+        newValue = Math.floor(Math.random() * gameColors.length);
+      } while (excludedIndicies.includes(newValue));
+      return newValue;
+    }
+
+    function assignNewBallColors() {
+      lastCollisionIteration = iteration;
+      console.log('Ball collision.');
+      // Don't let the new color be one of the current colors.
+      let excludedIndicies = [ballColors[0], ballColors[1]];
+      const newIndex = randomIndex(excludedIndicies);
+      ballColors[0] = newIndex;
+
+      // Add the new color of ball 0 to the list of unavailable colors.
+      excludedIndicies.push(newIndex);
+      ballColors[1] = randomIndex(excludedIndicies);
+
+      for (let index = 0; index < ballColors.length; index++) {
+        ballReverseColors[index] = (ballColors[index] + 3) % gameColors.length;
+      }
+      console.log(
+        `New colors: ${gameColorNames[ballReverseColors[0]]} & ${
+          gameColorNames[ballReverseColors[1]]
+        }`
+      );
+    }
+
     function draw() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       drawSquares();
 
-      scoreElement.textContent = `day ${dayScore} | night ${nightScore}`;
+      scoreElement.innerHTML = scoreText();
 
-      balls.forEach((ball) => {
-        drawBall(ball);
+      if (
+        ballsAreNeighbors(balls[0], balls[1]) &&
+        iteration > lastCollisionIteration + 2
+      ) {
+        assignNewBallColors();
+      }
+
+      balls.forEach((ball, indx) => {
+        if (indx === 1) drawPaper(ball);
+        else {
+          drawBall(ball);
+        }
         checkSquareCollision(ball);
         checkBoundaryCollision(ball);
         ball.x += ball.dx;
@@ -241,7 +403,7 @@
       });
 
       iteration++;
-      if (iteration % 1_000 === 0) console.log("iteration", iteration);
+      if (iteration % 1_000 === 0) console.log(`iteration ${iteration}`);
 
       requestAnimationFrame(draw);
     }
@@ -249,3 +411,7 @@
     requestAnimationFrame(draw);
   </script>
 </html>
+
+<!-- Orignal repo: https://github.com/vnglst/pong-wars -->
+<!-- Modification inspirtaion: https://github.com/SSteve/pong-wars -->
+<!-- When the balls collide they change colors. -->
