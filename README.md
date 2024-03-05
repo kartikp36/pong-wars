@@ -1,10 +1,20 @@
 # Rock, Paper, Scissors, Lizard & Spock
+<img src="image.png" alt="
+Scissors cuts Paper
+Paper covers Rock
+Rock crushes Lizard
+Lizard poisons Spock
+Spock smashes Scissors
+Scissors decapitates Lizard
+Lizard eats Paper
+Paper disproves Spock
+Spock vaporizes Rock
+(and as it always has) Rock crushes Scissors" width="200"/>
 
-![alt text](image.png)
 
 It's the eternal battle between Rock, Paper, Scissors, Lizard & Spock. Written in JavaScript with some HTML & CSS in one index.html. Feel free to reuse the code and create your own version.
 
-https://github.com/vnglst/pong-wars/assets/3457693/4eae12fa-bdc1-49ee-8b39-c94deb7cb2c8
+[Stone, Paper, Scissors, Lizard, Spock.webm](https://github.com/kartikp36/stone-paper-scissors-lizard-spock/assets/36930635/5b42786b-e1ab-4cc0-8852-7f16e2cafe55)
 
 ## Development
 
@@ -17,23 +27,13 @@ npx serve
 Open up the link and you're ready to start.
 
 ## Credits
-
-I saw this first [here](https://twitter.com/nicolasdnl/status/1749715070928433161), but it appears to be a much older idea. There's some more information on the history in the [Hacknernews discussion](https://news.ycombinator.com/item?id=39159418).
-
-The colors are based on the Mindful Palette by [Alex Cristache](https://twitter.com/AlexCristache/status/1738610343499157872).
-
-## Submitting PRs
-
-I love getting feedback and PRs with improvements for this, but I also want to keep this simple and the code minimal. If you want to extend the game, feel free to create your own. If you found a way to improve the collision detection (or a better way to add some randomness), feel free to open a PR.
-
+- built upon [pong-wars](https://pong-wars.koenvangilst.nl/), original repo: https://github.com/vnglst/pong-wars
 ## Links
 
 - Original post on Mastodon: https://hachyderm.io/@vnglst/111828811496422610
 - On Twitter: https://twitter.com/vnglst/status/1751278052154179770
 
 ## Alternate version
-
-If you've created an alternate version of Pong Wars and want to share, feel free to create a PR to add the link here:
 
 - [BBC Micro Bot](https://mastodon.me.uk/@bbcmicrobot/111829277042377169)
 - [Earlier version with padels](https://twitter.com/CasualEffects/status/1390290306206216196)
