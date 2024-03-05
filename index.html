@@ -41,7 +41,6 @@
         border-radius: 4px;
         overflow: hidden;
         width: 100%;
-        margin-top: auto;
         box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
       }
 
@@ -69,12 +68,57 @@
         color: #172b36;
       }
     </style>
+    <style>
+      /* Tooltip container */
+      .tooltip {
+        position: relative;
+        display: inline-block;
+        cursor: help;
+        padding-top: 8vh;
+        font-family: system-ui, sans-serif, monospace;
+      }
+
+      /* Tooltip text */
+      .tooltip .tooltiptext {
+        visibility: hidden;
+        width: 100%;
+        background-color: #333333a3;
+        color: #fff;
+        border-radius: 6px;
+        padding: 1rem;
+        position: absolute;
+        z-index: 1;
+        top: 100%;
+        opacity: 0;
+        transition: opacity 0.3s;
+      }
+
+      /* Show the tooltip text when hovering over the tooltip container */
+      .tooltip:hover .tooltiptext {
+        visibility: visible;
+        opacity: 1;
+      }
+    </style>
   </head>
 
   <body>
     <div id="container">
+      <!-- Tooltip container -->
+      <div class="tooltip">
+        <h2>Stone, Paper, Scissors, Lizard, Spock</h2>
+        <!-- Tooltip text -->
+        <span class="tooltiptext">
+          <br />Scissors cuts Paper <br />Paper covers Rock <br />Rock crushes
+          Lizard <br />Lizard poisons Spock <br />Spock smashes Scissors
+          <br />Scissors decapitates Lizard <br />Lizard eats Paper <br />Paper
+          disproves Spock <br />Spock vaporizes Rock <br />(and as it always
+          has) Rock crushes Scissors
+        </span>
+      </div>
       <canvas id="pongCanvas" width="800" height="800"></canvas>
+
       <div id="score"></div>
+
       <p id="made">
         made by
         <a href="https://patelkartik.me" target="_blank">Kartik Patel</a>
@@ -140,7 +184,7 @@
     const SQUARE_SIZE = 25;
 
     const MIN_SPEED = 5;
-    const MAX_SPEED = 15;
+    const MAX_SPEED = 12;
 
     const numSquaresX = canvas.width / SQUARE_SIZE;
     const numSquaresY = canvas.height / SQUARE_SIZE;
@@ -393,12 +437,12 @@
 
       scoreElement.innerHTML = scoreText();
 
-      if (
-        ballsAreNeighbors(balls[0], balls[1]) &&
-        iteration > lastCollisionIteration + 2
-      ) {
-        assignNewBallColors();
-      }
+      // if (
+      //   ballsAreNeighbors(balls[0], balls[1]) &&
+      //   iteration > lastCollisionIteration + 2
+      // ) {
+      //   assignNewBallColors();
+      // }
 
       balls.forEach((ball, indx) => {
         if (indx === 1) drawPaper(ball);
