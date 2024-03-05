@@ -24,7 +24,7 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        background: linear-gradient(to bottom, #172b36 0%, #d9e8e3 100%);
+        background: linear-gradient(to bottom, #f6cfbe 0%, #b9dcf2 100%);
       }
 
       #container {
@@ -76,10 +76,14 @@
       <canvas id="pongCanvas" width="800" height="800"></canvas>
       <div id="score"></div>
       <p id="made">
-        made by <a href="https://koenvangilst.nl">Koen van Gilst</a> | source on
-        <a href="https://github.com/vnglst/pong-wars">github</a> | modified by
-        Steve Nicholson | source on
-        <a href="https://github.com/ssteve/pong-wars">github</a>
+        made by
+        <a href="https://patelkartik.me" target="_blank">Kartik Patel</a>
+        | source on
+        <a href="https://github.com/kartikp36/pong-wars" target="_blank"
+          >github</a
+        >
+        | orignal:
+        <a href="https://pong-wars.koenvangilst.nl/">pong wars</a>
       </p>
     </div>
   </body>
@@ -106,6 +110,13 @@
       '#D7F4D7', //lizard
       '#D5E4FF', //spock
     ];
+    const ballColorCodes = [
+      '#E8868E', //stone
+      '#FCDF58', //paper
+      '#E07FFE', //scissors
+      '#8EDE96', //lizard
+      '#81B3FF', //spock
+    ];
 
     const gameColorNames = ['stone', 'paper', 'lizard', 'scissors', 'spock'];
 
@@ -116,15 +127,15 @@
     const scoreElement = document.getElementById('score');
 
     const DAY_COLOR = 0;
-    const DAY_BALL_COLOR = 1;
+    const DAY_BALL_COLOR = 0;
     const NIGHT_COLOR = 1;
-    const NIGHT_BALL_COLOR = 2;
+    const NIGHT_BALL_COLOR = 1;
     const AFTERNOON_COLOR = 2;
-    const AFTERNOON_BALL_COLOR = 3;
+    const AFTERNOON_BALL_COLOR = 2;
     const EVENING_COLOR = 3;
-    const EVENING_BALL_COLOR = 4;
+    const EVENING_BALL_COLOR = 3;
     const MORNING_COLOR = 4;
-    const MORNING_BALL_COLOR = 0;
+    const MORNING_BALL_COLOR = 4;
 
     const SQUARE_SIZE = 25;
 
@@ -143,15 +154,15 @@
       squares[i] = [];
       for (let j = 0; j < numSquaresY; j++) {
         if (i + j < numSquaresX / 2) {
-          squares[i][j] = gameColors[MORNING_COLOR]; // Top-left triangle
+          squares[i][j] = gameColors[EVENING_COLOR]; // Top-left triangle
         } else if (i - j > numSquaresX / 2) {
-          squares[i][j] = gameColors[DAY_COLOR]; // Top-right triangle
-        } else if (i + j > (3 * numSquaresX) / 2) {
-          squares[i][j] = gameColors[AFTERNOON_COLOR]; // Bottom-left triangle
+          squares[i][j] = gameColors[NIGHT_COLOR]; // Top-right triangle
+        } else if (i + j > (3 * numSquaresX) / 2 - 2) {
+          squares[i][j] = gameColors[DAY_COLOR]; // Bottom-left triangle
         } else if (j - i > numSquaresX / 2) {
-          squares[i][j] = gameColors[EVENING_COLOR]; // Bottom-right triangle
+          squares[i][j] = gameColors[AFTERNOON_COLOR]; // Bottom-right triangle
         } else {
-          squares[i][j] = gameColors[NIGHT_COLOR]; // Inner square
+          squares[i][j] = gameColors[MORNING_COLOR]; // Inner square
         }
       }
     }
@@ -188,7 +199,7 @@
         x: canvas.width,
         y: 1,
         dx: startSpeed(),
-        dy: startSpeed(),
+        dy: -startSpeed(),
         id: 1,
       },
       {
@@ -201,7 +212,7 @@
       {
         x: 1,
         y: 1,
-        dx: startSpeed(),
+        dx: -startSpeed(),
         dy: -startSpeed(),
         id: 3,
       },
@@ -220,7 +231,7 @@
     function drawBall(ball) {
       ctx.beginPath();
       ctx.arc(ball.x, ball.y, SQUARE_SIZE / 2, 0, Math.PI * 2, false);
-      ctx.fillStyle = gameColors[ballColors[ball.id]];
+      ctx.fillStyle = ballColorCodes[ballColors[ball.id]];
       ctx.fill();
       ctx.closePath();
     }
@@ -233,7 +244,7 @@
         SQUARE_SIZE
       );
 
-      ctx.fillStyle = gameColors[ballColors[ball.id]];
+      ctx.fillStyle = ballColorCodes[ballColors[ball.id]];
       ctx.fill();
       ctx.closePath();
     }
