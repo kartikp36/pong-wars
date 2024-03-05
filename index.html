@@ -382,6 +382,7 @@
 
     function scoreText() {
       let text = '';
+      let maxScore = Math.max(...colorScores);
       for (let index = 0; index < gameColors.length; index++) {
         if (colorScores[index] > 0) {
           if (text.length > 0) text += ' | ';
@@ -389,13 +390,24 @@
           let nameSuffix = '';
           if (ballReverseColors.includes(index)) {
             // Highlight the names of the current colors.
-            namePrefix = `<span style='background-color: ${gameColors[index]};'>`;
+            namePrefix = `<span style='background-color: ${
+              colorScores[index] === maxScore
+                ? ballColorCodes[index]
+                : gameColors[index]
+            };'>`;
             nameSuffix = '</span>';
           }
           text += `${namePrefix}${gameColorNames[index]}${nameSuffix}&nbsp;`;
-          text += `${colorScores[index]}`
-            .padStart(3, `x`)
-            .replace(/x/g, '&nbsp;');
+          text +=
+            colorScores[index] === maxScore
+              ? `<b>` +
+                `${colorScores[index]}`
+                  .padStart(3, `x`)
+                  .replace(/x/g, '&nbsp;') +
+                '</b>'
+              : `${colorScores[index]}`
+                  .padStart(3, `x`)
+                  .replace(/x/g, '&nbsp;');
         }
       }
       return text;
