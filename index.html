@@ -25,6 +25,7 @@
         justify-content: center;
         align-items: center;
         background: linear-gradient(to bottom, #f6cfbe 0%, #b9dcf2 100%);
+        font-family: system-ui, sans-serif, monospace;
       }
 
       #container {
@@ -99,14 +100,82 @@
         visibility: visible;
         opacity: 1;
       }
+
+      /*Dialog Styles*/
+      dialog {
+        padding: 1rem 3rem;
+        background: white;
+        padding-top: 2rem;
+        border-radius: 2rem;
+        border: 0;
+        box-shadow: 0 5px 30px 0 #000;
+        animation: fadeIn 1s ease both;
+      }
+      dialog::backdrop {
+        animation: fadeIn 1s ease both;
+        z-index: 2;
+        backdrop-filter: blur(20px);
+      }
+      dialog .x {
+        filter: grayscale(1);
+        border: none;
+        background: none;
+        position: absolute;
+        top: 15px;
+        right: 10px;
+        transition: ease filter, transform 0.3s;
+        cursor: pointer;
+        transform-origin: center;
+      }
+      dialog .x:hover {
+        filter: grayscale(0);
+        transform: scale(1.1);
+      }
+
+      /*General Styles*/
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
     </style>
   </head>
 
   <body>
     <div id="container">
+      <dialog id="mydialog">
+        <div>
+          <iframe
+            width="560"
+            height="315"
+            src="https://www.youtube.com/embed/6s9k5rwBWB4?si=Agca-xqiF2gUj1B7&amp;start=25"
+            title="YouTube video player"
+            frameborder="0"
+            style="border-radius: 2rem"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowfullscreen
+          ></iframe>
+        </div>
+        <h2>~ Sheldon Lee Cooper</h2>
+
+        <button onclick="window.mydialog.close();" aria-label="close" class="x">
+          ❌
+        </button>
+      </dialog>
       <!-- Tooltip container -->
       <div class="tooltip">
-        <h2>Stone, Paper, Scissors, Lizard, Spock</h2>
+        <h2>
+          <a
+            href="https://youtu.be/6s9k5rwBWB4?si=ydKMHHAXam3qxIQ3&t=25"
+            target="_blank"
+            style="text-decoration: none; color: #172b36"
+          >
+            Stone, Paper, Scissors, Lizard, Spock</a
+          >
+        </h2>
         <!-- Tooltip text -->
         <span class="tooltiptext">
           <br />Scissors cuts Paper <br />Paper covers Rock <br />Rock crushes
@@ -121,14 +190,17 @@
       <div id="score"></div>
 
       <p id="made">
-        made by
-        <a href="https://patelkartik.me" target="_blank">Kartik Patel</a>
+        <u style="cursor: pointer" onclick="window.mydialog.showModal();"
+          >what's this?</u
+        >
+        | made by
+        <a href="https://patelkartik.me" target="_blank">kartik Patel</a>
         | source on
         <a href="https://github.com/kartikp36/pong-wars" target="_blank"
           >github</a
         >
         | orignal:
-        <a href="https://pong-wars.koenvangilst.nl/">pong wars</a>
+        <a href="https://pong-wars.koenvangilst.nl/">pong wars</a> |
       </p>
     </div>
   </body>
@@ -276,19 +348,6 @@
     function drawBall(ball) {
       ctx.beginPath();
       ctx.arc(ball.x, ball.y, SQUARE_SIZE / 2, 0, Math.PI * 2, false);
-      ctx.fillStyle = ballColorCodes[ballColors[ball.id]];
-      ctx.fill();
-      ctx.closePath();
-    }
-    function drawPaper(ball) {
-      ctx.beginPath();
-      ctx.rect(
-        ball.x - SQUARE_SIZE / 2,
-        ball.y - SQUARE_SIZE / 2,
-        SQUARE_SIZE,
-        SQUARE_SIZE
-      );
-
       ctx.fillStyle = ballColorCodes[ballColors[ball.id]];
       ctx.fill();
       ctx.closePath();
@@ -450,18 +509,28 @@
 
       scoreElement.innerHTML = scoreText();
 
-      // if (
-      //   ballsAreNeighbors(balls[0], balls[1]) &&
-      //   iteration > lastCollisionIteration + 2
-      // ) {
-      //   assignNewBallColors();
-      // }
+      if (
+        ballsAreNeighbors(balls[0], balls[1]) ||
+        ballsAreNeighbors(balls[2], balls[3]) ||
+        ballsAreNeighbors(balls[0], balls[2]) ||
+        ballsAreNeighbors(balls[1], balls[3]) ||
+        ballsAreNeighbors(balls[0], balls[3]) ||
+        ballsAreNeighbors(balls[1], balls[2]) ||
+        ballsAreNeighbors(balls[0], balls[4]) ||
+        ballsAreNeighbors(balls[1], balls[4]) ||
+        ballsAreNeighbors(balls[2], balls[4]) ||
+        ballsAreNeighbors(balls[3], balls[4])
+      ) {
+        console.log('Collision!');
+        balls[0].dx = -balls[0].dx;
+        balls[1].dx = -balls[0].dx;
+        balls[2].dx = -balls[0].dx;
+        balls[3].dx = -balls[0].dx;
+        balls[4].dx = -balls[0].dx;
+      }
 
       balls.forEach((ball, indx) => {
-        if (indx === 1) drawPaper(ball);
-        else {
-          drawBall(ball);
-        }
+        drawBall(ball);
         checkSquareCollision(ball);
         checkBoundaryCollision(ball);
         ball.x += ball.dx;
@@ -477,6 +546,14 @@
     }
 
     requestAnimationFrame(draw);
+  </script>
+  <script>
+    var dialog = document.getElementById('mydialog');
+    dialog.addEventListener('click', function (event) {
+      if (event.target === dialog) {
+        dialog.close();
+      }
+    });
   </script>
 </html>
 
